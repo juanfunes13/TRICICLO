@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Triciclo — Comunicaciones</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
+  <style>
+    /* Importación de fuentes limpias, redondeadas y geométricas como alternativas para simular Caviar Dreams con bordes suaves */
+    @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@400&family=Montserrat:wght@300;400&display=swap');
+
+    :root {
+      --rojo: #B71C2A;
+      --rojo-oscuro: #8B1520;
+      --rojo-claro: #D42535;
+      --menta: #9DC4B0;
+      --menta-claro: #C2DACE;
+      --crema: #F5EFE6;
+      --blanco: #FAFAF7;
+      --negro: #1A1208;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--rojo);
+      color: var(--crema);
+      font-family: 'DM Sans', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* Estilo corregido: marca en minúscula, Caviar Dreams / Comfortaa para esquinas 100% redondeadas */
+    .brand-title {
+      font-family: "Caviar Dreams", "Comfortaa", "Montserrat", sans-serif !important;
+      font-weight: 400 !important;
+      text-transform: lowercase !important;
+      letter-spacing: 0.03em;
+    }
+
+    /* ── CURSOR ── */
+    html { cursor: none; }
+    #cursor {
+      width: 14px; height: 14px;
+      background: var(--menta);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none;
+      z-index: 9999;
+      transition: transform 0.15s ease, background 0.2s;
+      mix-blend-mode: difference;
+    }
+    #cursor.big { transform: scale(3); background: var(--crema); }
+
+    /* ── NOISE TEXTURE ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1.5rem 3rem;
+      mix-blend-mode: normal;
+    }
+    .nav-logo {
+      font-size: 1.6rem;
+      color: var(--menta-claro);
+      text-decoration: none;
+    }
+    .nav-links {
+      display: flex; gap: 2.5rem;
+      list-style: none;
+    }
+    .nav-links a {
+      color: var(--crema);
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      opacity: 0.75;
+      transition: opacity 0.2s, color 0.2s;
+    }
+    .nav-links a:hover { opacity: 1; color: var(--menta-claro); }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      padding: 0 3rem;
+      gap: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-text { padding-top: 6rem; position: relative; z-index: 2; }
+
+    .hero-eyebrow {
+      font-size: 0.7rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--menta);
+      margin-bottom: 1.5rem;
+      font-weight: 500;
+    }
+
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3.5rem, 7vw, 6.5rem);
+      line-height: 0.95;
+      font-weight: 900;
+      color: var(--crema);
+      margin-bottom: 2rem;
+    }
+    .hero-title em {
+      font-style: italic;
+      color: var(--menta-claro);
+    }
+
+    .hero-desc {
+      font-size: 1.05rem;
+      line-height: 1.7;
+      max-width: 420px;
+      color: var(--crema);
+      opacity: 0.8;
+      margin-bottom: 2.5rem;
+      font-weight: 300;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      background: var(--menta);
+      color: var(--negro);
+      padding: 0.9rem 2.2rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border: none;
+      cursor: none;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .btn-primary:hover {
+      background: var(--menta-claro);
+      transform: translateY(-2px);
+    }
+
+    /* Hero illustration side */
+    .hero-illustration {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 2;
+      padding-top: 4rem;
+    }
+    .hero-illustration img {
+      width: min(520px, 95%);
+      animation: float 5s ease-in-out infinite;
+      filter: drop-shadow(0 30px 60px rgba(0,0,0,0.3));
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-18px); }
+    }
+
+    /* Big background text */
+    .hero-bg-text {
+      position: absolute;
+      bottom: -0.05em;
+      left: -0.05em;
+      font-size: clamp(8rem, 22vw, 20rem);
+      line-height: 1;
+      color: var(--rojo-oscuro);
+      pointer-events: none;
+      user-select: none;
+      z-index: 1;
+      white-space: nowrap;
+    }
+
+    /* ── DIVIDER ── */
+    .section-divider {
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(to right, transparent, var(--menta), transparent);
+      opacity: 0.3;
+      margin: 0 auto;
+    }
+
+    /* ── SERVICES ── */
+    #servicios {
+      padding: 8rem 3rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .section-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--menta);
+      margin-bottom: 3rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .section-label::after {
+      content: '';
+      flex: 1;
+      max-width: 60px;
+      height: 1px;
+      background: var(--menta);
+      opacity: 0.5;
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      border: 1px solid rgba(157, 196, 176, 0.2);
+    }
+
+    .service-card {
+      padding: 3rem 2.5rem;
+      border-right: 1px solid rgba(157, 196, 176, 0.2);
+      position: relative;
+      overflow: hidden;
+      transition: background 0.35s;
+    }
+    .service-card:last-child { border-right: none; }
+    .service-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(157,196,176,0.08), transparent);
+      opacity: 0;
+      transition: opacity 0.35s;
+    }
+    .service-card:hover::before { opacity: 1; }
+
+    .service-number {
+      font-family: 'Playfair Display', serif;
+      font-size: 5rem;
+      font-weight: 900;
+      line-height: 1;
+      color: var(--rojo-oscuro);
+      margin-bottom: 1.5rem;
+      transition: color 0.35s;
+    }
+    .service-card:hover .service-number { color: var(--menta); }
+
+    .service-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--crema);
+      margin-bottom: 1rem;
+      line-height: 1.2;
+    }
+    .service-desc {
+      font-size: 0.9rem;
+      line-height: 1.7;
+      color: var(--crema);
+      opacity: 0.65;
+      font-weight: 300;
+    }
+
+    /* ── NOSOTROS ── */
+    #nosotros {
+      padding: 8rem 3rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6rem;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .nosotros-text .big-quote {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 400;
+      font-style: italic;
+      line-height: 1.3;
+      color: var(--crema);
+      margin-bottom: 2rem;
+    }
+    .nosotros-text .big-quote strong {
+      font-style: normal;
+      font-weight: 900;
+      color: var(--menta-claro);
+    }
+
+    .nosotros-body {
+      font-size: 1rem;
+      line-height: 1.8;
+      color: var(--crema);
+      opacity: 0.75;
+      font-weight: 300;
+    }
+
+    .nosotros-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: rgba(157,196,176,0.15);
+    }
+    .stat-box {
+      background: var(--rojo);
+      padding: 2.5rem 2rem;
+      text-align: center;
+      transition: background 0.3s;
+    }
+    .stat-box:hover { background: var(--rojo-oscuro); }
+    .stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 3.5rem;
+      font-weight: 900;
+      color: var(--menta-claro);
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+    .stat-box:hover .stat-num { color: var(--menta); }
+    .stat-label {
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--crema);
+      opacity: 0.6;
+    }
+
+    /* ── CONTACTO ── */
+    #contacto {
+      padding: 8rem 3rem;
+      max-width: 700px;
+      margin: 0 auto;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    #contacto h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.5rem, 5vw, 4.5rem);
+      font-weight: 900;
+      line-height: 1;
+      margin-bottom: 1.5rem;
+      color: var(--crema);
+    }
+    #contacto h2 em {
+      font-style: italic;
+      color: var(--menta-claro);
+    }
+    #contacto p {
+      font-size: 1rem;
+      opacity: 0.7;
+      font-weight: 300;
+      margin-bottom: 3rem;
+      line-height: 1.6;
+    }
+
+    .contact-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      text-align: left;
+    }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+
+    .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+
+    .form-group label {
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--menta);
+      font-weight: 500;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      background: rgba(157,196,176,0.06);
+      border: 1px solid rgba(157, 196, 176, 0.25);
+      color: var(--crema);
+      padding: 0.9rem 1.1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 300;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+      width: 100%;
+      cursor: none;
+    }
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+      color: rgba(245,239,230,0.3);
+    }
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      border-color: var(--menta);
+      background: rgba(157,196,176,0.1);
+    }
+    .form-group select option { background: var(--rojo-oscuro); }
+
+    .form-group textarea { resize: vertical; min-height: 130px; }
+
+    .btn-submit {
+      background: var(--menta);
+      color: var(--negro);
+      padding: 1rem 3rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      border: none;
+      cursor: none;
+      align-self: center;
+      margin-top: 0.5rem;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .btn-submit:hover {
+      background: var(--menta-claro);
+      transform: translateY(-2px);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid rgba(157,196,176,0.15);
+      padding: 2.5rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+    .footer-logo {
+      font-size: 1.2rem;
+      color: var(--menta);
+    }
+    footer p {
+      font-size: 0.75rem;
+      opacity: 0.4;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── ANIMACIONES ── */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      nav { padding: 1.2rem 1.5rem; }
+      .nav-links { display: none; }
+      #hero { grid-template-columns: 1fr; padding: 0 1.5rem; padding-top: 5rem; }
+      .hero-illustration { display: none; }
+      .hero-title { font-size: clamp(2.8rem, 10vw, 4.5rem); }
+      .services-grid { grid-template-columns: 1fr; }
+      .service-card { border-right: none; border-bottom: 1px solid rgba(157,196,176,0.2); }
+      #nosotros { grid-template-columns: 1fr; gap: 3rem; padding: 5rem 1.5rem; }
+      #servicios { padding: 5rem 1.5rem; }
+      #contacto { padding: 5rem 1.5rem; }
+      .form-row { grid-template-columns: 1fr; }
+      footer { flex-direction: column; gap: 1rem; text-align: center; padding: 2rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="cursor"></div>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#hero" class="nav-logo brand-title">triciclo</a>
+    <ul class="nav-links">
+      <li><a href="#servicios">Servicios</a></li>
+      <li><a href="#nosotros">Nosotros</a></li>
+      <li><a href="#contacto">Contacto</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-bg-text brand-title">triciclo</div>
+
+    <div class="hero-text">
+      <p class="hero-eyebrow">Consultoría · Eventos · Capacitación</p>
+      <h1 class="hero-title">
+        Llevemos tu<br>
+        <em>comunicación</em><br>
+        al siguiente<br>nivel.
+      </h1>
+      <p class="hero-desc">
+        Transformamos la manera en que las organizaciones comunican, conectan y crecen.
+      </p>
+      <a href="#contacto" class="btn-primary">Hablemos</a>
+    </div>
+
+    <div class="hero-illustration">
+      <img src="./triciclo png.png" alt="Triciclo">
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- SERVICIOS -->
+  <section id="servicios">
+    <p class="section-label fade-up">Servicios</p>
+    <div class="services-grid">
+
+      <div class="service-card fade-up">
+        <div class="service-number">01</div>
+        <h3 class="service-title">Consultoría en Comunicaciones</h3>
+        <p class="service-desc">Creamos estrategias de comunicación que reflejan la esencia de tu marca, conectando efectivamente con tu audiencia objetivo.</p>
+      </div>
+
+      <div class="service-card fade-up" style="transition-delay:0.1s">
+        <div class="service-number">02</div>
+        <h3 class="service-title">Organización de Eventos</h3>
+        <p class="service-desc">Desde conferencias hasta talleres, manejamos todos los aspectos para que tu evento sea verdaderamente memorable.</p>
+      </div>
+
+      <div class="service-card fade-up" style="transition-delay:0.2s">
+        <div class="service-number">03</div>
+        <h3 class="service-title">Capacitación de Personal</h3>
+        <p class="service-desc">Capacitamos a tu equipo con las últimas tendencias y prácticas, asegurando una mejora continua en el desempeño de tu empresa.</p>
+      </div>
+
+      <div class="service-card fade-up" style="transition-delay:0.3s">
+        <div class="service-number">04</div>
+        <h3 class="service-title">Gestión de Prensa</h3>
+        <p class="service-desc">Desarrollamos vínculos estratégicos con medios de comunicación, gestionamos entrevistas, comunicados y oportunidades de visibilidad para fortalecer el posicionamiento y la reputación de tu organización.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- NOSOTROS -->
+  <section id="nosotros">
+    <div class="nosotros-text fade-up">
+      <p class="section-label">Nosotros</p>
+      <p class="big-quote">
+        Aceleramos el éxito de tu empresa con <strong>consultoría experta</strong> y <strong>estrategia real.</strong>
+      </p>
+      <p class="nosotros-body">
+        En Triciclo nuestra misión es transformar la manera en que las organizaciones comunican, conectan y crecen. A través de una consultoría personalizada, eventos impactantes y capacitaciones de alto nivel, acompañamos a cada organización en su camino hacia el siguiente nivel.
+      </p>
+    </div>
+
+    <div class="nosotros-stats fade-up" style="transition-delay:0.15s">
+      <div class="stat-box">
+        <div class="stat-num">+100</div>
+        <div class="stat-label">Clientes</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">+250</div>
+        <div class="stat-label">Eventos</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">3</div>
+        <div class="stat-label">Servicios especializados</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">∞</div>
+        <div class="stat-label">Potencial de crecimiento</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- CONTACTO -->
+  <section id="contacto">
+    <p class="section-label" style="justify-content:center">Contacto</p>
+    <h2 class="fade-up">Pongámonos<br><em>en marcha.</em></h2>
+    <p class="fade-up">Completá tus datos y un integrante del equipo Triciclo se pondrá en contacto con vos a la brevedad.</p>
+
+    <form class="contact-form fade-up" onsubmit="handleSubmit(event)">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="nombre">Nombre</label>
+          <input type="text" id="nombre" placeholder="Tu nombre" required />
+        </div>
+        <div class="form-group">
+          <label for="apellido">Apellido</label>
+          <input type="text" id="apellido" placeholder="Tu apellido" required />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="nombre@empresa.com" required />
+        </div>
+        <div class="form-group">
+          <label for="empresa">Empresa</label>
+          <input type="text" id="empresa" placeholder="Nombre de tu empresa" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="servicio">¿En qué podemos ayudarte?</label>
+        <select id="servicio">
+          <option value="">Seleccioná un servicio</option>
+          <option value="comunicaciones">Consultoría en Comunicaciones</option>
+          <option value="eventos">Organización de Eventos</option>
+          <option value="entrenamiento">Capacitación de Personal</option>
+          <option value="todo">Todos los servicios</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="mensaje">Mensaje</label>
+        <textarea id="mensaje" placeholder="Contanos brevemente tu proyecto o consulta…"></textarea>
+      </div>
+
+      <button type="submit" class="btn-submit">Enviar mensaje</button>
+    </form>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo brand-title">triciclo</div>
+    <p>© 2026 triciclo. Todos los derechos reservados.</p>
+  </footer>
+
+  <script>
+    // Custom cursor
+    const cursor = document.getElementById('cursor');
+    document.addEventListener('mousemove', e => {
+      cursor.style.left = e.clientX - 7 + 'px';
+      cursor.style.top = e.clientY - 7 + 'px';
+    });
+    document.querySelectorAll('a, button, input, textarea, select').forEach(el => {
+      el.addEventListener('mouseenter', () => cursor.classList.add('big'));
+      el.addEventListener('mouseleave', () => cursor.classList.remove('big'));
+    });
+
+    // Scroll animations
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) e.target.classList.add('visible');
+      });
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+    // Form submit
+    function handleSubmit(e) {
+      e.preventDefault();
+      const btn = e.target.querySelector('.btn-submit');
+      btn.textContent = '¡Mensaje enviado!';
+      btn.style.background = 'var(--menta-claro)';
+      setTimeout(() => {
+        btn.textContent = 'Enviar mensaje';
+        btn.style.background = '';
+        e.target.reset();
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
