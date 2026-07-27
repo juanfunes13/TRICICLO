@@ -600,8 +600,8 @@
     <p class="fade-up">Completá tus datos y un integrante del equipo Triciclo se pondrá en contacto con vos a la brevedad.</p>
 
     <form class="contact-form fade-up" onsubmit="handleSubmit(event)">
-  <input type="hidden" name="email" value="contacto@triciclolatam.com">
-  <input type="hidden" name="redirectTo" value="https://triciclolatam.com">
+ <input type="hidden" name="apiKey" value="sf_1ccf9f0715574794e6a03902" />
+<input type="hidden" name="subject" value="Contacto desde la Web Triciclo" />
 
       <div class="form-row">
         <div class="form-group">
@@ -679,7 +679,7 @@
   const btn = e.target.querySelector('.btn-submit');
   const formData = new FormData(e.target);
 
-  fetch('https://staticforms.xyz', {
+  fetch('https://staticforms.dev', {
     method: 'POST',
     body: formData
   })
