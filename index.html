@@ -679,9 +679,12 @@
   const btn = e.target.querySelector('.btn-submit');
   const formData = new FormData(e.target);
 
-    fetch('https://staticforms.dev', {
+      fetch('https://staticforms.dev', {
     method: 'POST',
-    body: formData
+    body: formData,
+    headers: {
+      'Accept': 'application/json'
+    }
   })
   .then(response => {
     if (response.ok) {
