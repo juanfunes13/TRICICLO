@@ -599,7 +599,7 @@
     <h2 class="fade-up">Pongámonos<br><em>en marcha.</em></h2>
     <p class="fade-up">Completá tus datos y un integrante del equipo Triciclo se pondrá en contacto con vos a la brevedad.</p>
 
-    <form action="https://staticforms.xyz" method="POST" class="contact-form fade-up">
+    <form class="contact-form fade-up" onsubmit="handleSubmit(event)">
   <input type="hidden" name="email" value="contacto@triciclolatam.com">
   <input type="hidden" name="redirectTo" value="https://triciclolatam.com">
 
@@ -673,16 +673,34 @@
     document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
 
     // Form submit
-    function handleSubmit(e) {
-      const btn = e.target.querySelector('.btn-submit');
+   function handleSubmit(e) {
+  e.preventDefault();
+
+  const btn = e.target.querySelector('.btn-submit');
+  const formData = new FormData(e.target);
+
+  fetch('https://staticforms.xyz', {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => {
+    if (response.ok) {
       btn.textContent = '¡Mensaje enviado!';
       btn.style.background = 'var(--menta-claro)';
+      e.target.reset();
+
       setTimeout(() => {
         btn.textContent = 'Enviar mensaje';
         btn.style.background = '';
-        e.target.reset();
       }, 3000);
+    } else {
+      alert('Hubo un error al enviar. Por favor, intenta nuevamente.');
     }
+  })
+  .catch(error => {
+    alert('Error de conexión. Intenta nuevamente.');
+  });
+}
   </script>
 </body>
 </html>
