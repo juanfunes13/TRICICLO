@@ -673,17 +673,18 @@
     document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
 
     // Form submit
-  function handleSubmit(e) {
+ function handleSubmit(e) {
   e.preventDefault();
 
   const btn = e.target.querySelector('.btn-submit');
   const formData = new FormData(e.target);
 
-  // Convertimos los datos a un formato plano clásico
+  // Convertimos los datos del formulario a un formato plano clásico
   const data = {};
   formData.forEach((value, key) => data[key] = value);
 
-  fetch('https://staticforms.dev', {
+  // Enviamos los datos formateados correctamente
+  fetch('https://api.staticforms.dev/submit', {
     method: 'POST',
     body: JSON.stringify(data),
     headers: {
